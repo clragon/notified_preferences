@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:notified_preferences/notified_preferences.dart';
 
 import 'model.dart';
@@ -13,27 +11,15 @@ class Settings with NotifiedPreferences {
     initialValue: 0,
   );
 
-  /// It can also store complex objects if you tell it how:
-  late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
+  /// It can also store json objects, if they provide toJson and fromJson.
+  late final PreferenceNotifier<ComplexObject> complexObject =
+      createJsonSetting(
     key: 'complexObject',
     initialValue: ComplexObject(
       someInt: 0,
       someString: 'a',
     ),
-
-    /// If read returns null, initialValue will be used instead.
-    read: (prefs, key) {
-      String? value = prefs.getString(key);
-      ComplexObject? result;
-      if (value != null) {
-        return ComplexObject.fromJson(json.decode(value));
-      }
-      return result;
-    },
-    write: (prefs, key, value) => prefs.setStringOrNull(
-      key,
-      json.encode(value.toJson()),
-    ),
+    fromJson: ComplexObject.fromJson,
   );
 
   /// It provides convenience methods for storing enums:

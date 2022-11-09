@@ -4,84 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'nullable_preferences.dart';
+import 'preference_adapter.dart';
 import 'preference_notifier.dart';
-import 'preference_read_write.dart';
 
 /// Provides easily creating listenable preferences with [SharedPreferences].
 ///
 /// This class is supposed be used as a Mixin.
-/// A basic example of this is provided here:
-///
-/// ```dart
-/// class Settings with NotifiedPreferences {
-///   late final PreferenceNotifier<bool> hasSeenTutorial =
-///   createSetting(key: 'hasSeenTutorial', initial: false);
-///
-///   late final PreferenceNotifier<bool> buttonClicks =
-///   createSetting(key: 'buttonClicks', initial: 0);
-/// }
-/// ```
-///
-/// There can only ever be one [SharedPreferences] and therefore [NotifiedPreferences].
-/// It therefore makes sense to treat it as a quasi-global variable in your state management,
-/// for example by using an [InheritedWidget] above [MaterialApp].
-///
-/// The [SharedPreferences] have to be read from disk, so you have to initialize Settings in your main method:
-/// ```dart
-/// Future<void> main() async {
-///   await settings.initialize();
-///   runApp(MyApp());
-/// }
-/// ```
-///
-/// The settings object can then be used in combination with [ValueListenableBuilder] to provide and listen to your settings:
-///
-/// ```dart
-/// ValueListenableBuilder<int>(
-///   valueListenable: settings.buttonClicks,
-///   builder: (context, value, child) => Text('You have clicked the button $value times!'),
-/// )
-/// ```
-///
-/// And it can be used to set the value and update all listening widgets:
-/// ```dart
-/// FloatingActionButton(
-///   child: Icon(Icons.add),
-///   onPressed: () {
-///     settings.buttonClicks.value++;
-///   },
-/// )
-/// ```
-///
-/// If your Settings type does not match any of the predefined types,
-/// which are `String, int, double, bool, List<String>` and their nullable counterparts,
-/// you can provide custom methods to read and write it, like shown in the following example:
-///
-/// ```dart
-/// late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
-///   key: 'complexObject',
-///   initialValue: ComplexObject(
-///     someInt: 0,
-///     someString: 'a',
-///   ),
-///   read: (prefs, key) {
-///     String? value = prefs.getString(key);
-///     ComplexObject? result;
-///     if (value != null) {
-///       result = ComplexObject.fromJson(jsonDecode(value));
-///     }
-///     return result;
-///   },
-///   write: (prefs, key, value) => prefs.setStringOrNull(
-///     key,
-///     json.encode(value.toJson()),
-///   ),
-/// );
-/// ```
-///
-/// In this example we also use nullable extensions that the package provides
-/// to write a String? to SharedPreferences.
-/// This means, in case our String is null, we will instead delete the key.
 abstract class NotifiedPreferences {
   /// Initializes the [NotifiedPreferences].
   /// This method should be called in your main method, before runApp.
@@ -90,7 +18,10 @@ abstract class NotifiedPreferences {
   Future<void> initialize([FutureOr<SharedPreferences>? preferences]) async =>
       _prefs = await (preferences ?? SharedPreferences.getInstance());
 
+  /// internal sharedp preference instance.
   SharedPreferences? _prefs;
+
+  /// List of all notifiers created by this controller.
   final List<PreferenceNotifier> _notifiers = [];
 
   /// Creates a new Preference of type [T].
@@ -118,6 +49,27 @@ abstract class NotifiedPreferences {
       initialValue: initialValue,
       read: read,
       write: write,
+    );
+    _notifiers.add(notifier);
+    return notifier;
+  }
+
+  /// Creates a Preference that is encoded and decoded from json.
+  ///
+  /// Types using this must provide a toJson method.
+  /// [fromJson] will be used to instantiate the object.
+  @protected
+  PreferenceNotifier<T> createJsonSetting<T>({
+    required String key,
+    required T initialValue,
+    required DecodeJsonPreference<T> fromJson,
+  }) {
+    _assertInitialized();
+    final notifier = PreferenceNotifier<T>.json(
+      preferences: _prefs!,
+      key: key,
+      initialValue: initialValue,
+      fromJson: fromJson,
     );
     _notifiers.add(notifier);
     return notifier;
@@ -193,10 +145,12 @@ abstract class NotifiedPreferences {
 ///
 /// Can be used to create Preferences across multiple classes.
 class NotifiedSettings with NotifiedPreferences {
+  /// Creates an instace of [NotifiedSettings] with the specified [SharedPreferences].
   NotifiedSettings(SharedPreferences preferences) {
     _prefs = preferences;
   }
 
+  /// Creates an instace of [NotifiedSettings] with the default [SharedPreferences].
   static Future<NotifiedSettings> getInstance() async =>
       NotifiedSettings(await SharedPreferences.getInstance());
 
@@ -212,6 +166,18 @@ class NotifiedSettings with NotifiedPreferences {
         initialValue: initialValue,
         read: read,
         write: write,
+      );
+
+  @override
+  PreferenceNotifier<T> createJsonSetting<T>({
+    required String key,
+    required T initialValue,
+    required DecodeJsonPreference<T> fromJson,
+  }) =>
+      super.createJsonSetting(
+        key: key,
+        initialValue: initialValue,
+        fromJson: fromJson,
       );
 
   @override

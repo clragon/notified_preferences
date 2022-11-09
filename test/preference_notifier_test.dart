@@ -86,5 +86,7 @@ void main() {
       expect(notifier.value, 'def');
       expect(prefs.getString('abc'), 'def');
     });
+
+    test('should encode and decode to json', () {});
   });
 }

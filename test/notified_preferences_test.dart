@@ -1,7 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notified_preferences/notified_preferences.dart';
+
+import 'common.dart';
 
 void main() {
   group('NotifiedPreferences', () {
@@ -28,16 +28,16 @@ void main() {
       _TestSettings settings = _TestSettings();
       await settings.initialize();
       expect(settings.string.value, 'abc');
-      expect(settings.object.value, _TestObject(someInt: 5, someString: 'abc'));
-      expect(settings.testEnum.value, _TestEnum.a);
+      expect(settings.object.value, TestObject(someInt: 5, someString: 'abc'));
+      expect(settings.testEnum.value, TestEnum.a);
     });
 
     test('creates enum setting correctly', () async {
       _TestSettings settings = _TestSettings();
       await settings.initialize();
-      expect(settings.testEnum.value, _TestEnum.a);
-      settings.testEnum.value = _TestEnum.c;
-      expect(settings.testEnum.value, _TestEnum.c);
+      expect(settings.testEnum.value, TestEnum.a);
+      settings.testEnum.value = TestEnum.c;
+      expect(settings.testEnum.value, TestEnum.c);
       expect(prefs.getString('testEnum'), 'c');
     });
 
@@ -75,17 +75,23 @@ void main() {
 
     test('can create settings', () {
       NotifiedSettings settings = NotifiedSettings(prefs);
-      final string = settings.createSetting(
+      final string = settings.createSetting<String>(
         key: 'string',
         initialValue: 'abc',
       );
       expect(string.value, 'abc');
-      final testEnum = settings.createEnumSetting(
-        key: 'testEnum',
-        initialValue: _TestEnum.a,
-        values: _TestEnum.values,
+      final json = settings.createJsonSetting<TestObject>(
+        key: 'json',
+        initialValue: TestObject(someInt: 5, someString: 'abc'),
+        fromJson: TestObject.fromJson,
       );
-      expect(testEnum.value, _TestEnum.a);
+      expect(json.value, TestObject(someInt: 5, someString: 'abc'));
+      final testEnum = settings.createEnumSetting<TestEnum>(
+        key: 'testEnum',
+        initialValue: TestEnum.a,
+        values: TestEnum.values,
+      );
+      expect(testEnum.value, TestEnum.a);
     });
   });
 }
@@ -96,63 +102,16 @@ class _TestSettings with NotifiedPreferences {
     initialValue: 'abc',
   );
 
-  late final PreferenceNotifier<_TestObject> object = createSetting(
+  late final PreferenceNotifier<TestObject> object =
+      createJsonSetting<TestObject>(
     key: 'object',
-    initialValue: _TestObject(someInt: 5, someString: 'abc'),
-    read: (prefs, key) {
-      String? value = prefs.getString(key);
-      _TestObject? result;
-      if (value != null) {
-        return _TestObject.fromJson(json.decode(value));
-      }
-      return result;
-    },
-    write: (prefs, key, value) => prefs.setStringOrNull(
-      key,
-      json.encode(value.toJson()),
-    ),
+    initialValue: TestObject(someInt: 5, someString: 'abc'),
+    fromJson: TestObject.fromJson,
   );
 
-  late final PreferenceNotifier<_TestEnum> testEnum = createEnumSetting(
+  late final PreferenceNotifier<TestEnum> testEnum = createEnumSetting(
     key: 'testEnum',
-    initialValue: _TestEnum.a,
-    values: _TestEnum.values,
+    initialValue: TestEnum.a,
+    values: TestEnum.values,
   );
-}
-
-class _TestObject {
-  _TestObject({
-    required this.someInt,
-    required this.someString,
-  });
-
-  factory _TestObject.fromJson(Map<String, dynamic> json) => _TestObject(
-        someInt: json['someInt'],
-        someString: json['someString'],
-      );
-
-  Map<String, dynamic> toJson() => {
-        'someInt': someInt,
-        'someString': someString,
-      };
-
-  final int someInt;
-  final String someString;
-
-  @override
-  operator ==(Object other) {
-    if (other is _TestObject) {
-      return someInt == other.someInt && someString == other.someString;
-    }
-    return false;
-  }
-
-  @override
-  int get hashCode => Object.hash(someInt, someString);
-}
-
-enum _TestEnum {
-  a,
-  b,
-  c;
 }

@@ -18,11 +18,12 @@ If you're already using `shared_preferences`, you can replace it.
   - [Getting started](#getting-started)
   - [Widgets](#widgets)
   - [Listeners](#listeners)
-  - [Custom types](#custom-types)
+  - [Json](#json)
   - [Enums](#enums)
 - [Advanced usage](#advanced-usage)
   - [Custom shared prefs instance](#custom-shared-prefs-instance)
   - [Manual notifiers](#manual-notifiers)
+  - [Custom Read/Write](#custom-readwrite)
   - [Decentralised settings](#decentralised-settings)
 
 ## Usage
@@ -97,38 +98,26 @@ void dispose() {
 
 ! Using anonymous functions with `addListener` leads to them being unable of being removed !
 
-### Custom types
+### Json
 
 If you want to store preferences which aren't contained in the base types,
 `String, int, double, bool, List<String>` and their nullable counterparts,
-you can specify custom read and write functions:
+you can store them as json:
 
 ```dart
-late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
+late final PreferenceNotifier<ComplexObject> complexObject = createJsonSetting(
   key: 'complexObject',
   initialValue: ComplexObject(
     someInt: 0,
     someString: 'a',
   ),
-  // If read returns null, initalValue will be used instead.
-  read: (prefs, key) {
-    String? value = prefs.getString(key);
-    ComplexObject? result;
-    if (value != null) {
-      result = ComplexObject.fromJson(jsonDecode(value));
-    }
-    return result;
-  },
-  write: (prefs, key, value) => prefs.setStringOrNull(
-    key,
-    json.encode(value.toJson()),
-  ),
+  fromJson: ComplexObject.fromJson,
 );
 ```
 
 ### Enums
 
-If you want to store enums, convenience methods are provided:
+If you want to store enums, a convenience method is provided:
 
 ```dart
 late final PreferenceNotifier<SomeEnum> someEnum = createEnumSetting(
@@ -162,6 +151,34 @@ final myNotifier = PreferenceNotifier<T>(
   write: write,
 );
 ```
+
+### Custom Read/Write
+
+If you somehow want to implement custom logic inside read or write of your Preferences, you can do so:
+
+```dart
+late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
+  key: 'complexObject',
+  initialValue: ComplexObject(
+    someInt: 0,
+    someString: 'a',
+  ),
+  read: (prefs, key) {
+    String? value = prefs.getString(key);
+    ComplexObject? result;
+    if (value != null) {
+      result = ComplexObject.fromJson(jsonDecode(value));
+    }
+    return result;
+  },
+  write: (prefs, key, value) => prefs.setStringOrNull(
+    key,
+    json.encode(value.toJson()),
+  ),
+);
+```
+
+Note that read cannot be async.
 
 ### Decentralised settings
 

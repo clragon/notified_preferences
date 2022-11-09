@@ -1,11 +1,28 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'nullable_preferences.dart';
-import 'preference_read_write.dart';
+
+/// Reads [value] from [key].
+typedef PreferenceReader<T> = T? Function(String key);
+
+/// Writes [value] to [key].
+typedef PreferenceWriter<T> = Future<bool> Function(String key, T value);
+
+/// Reads a Preference from [SharedPreferences].
+typedef ReadPreference<T> = T? Function(SharedPreferences prefs, String key);
+
+/// Writes a Preference to [SharedPreferences].
+typedef WritePreference<T> = void Function(
+    SharedPreferences prefs, String key, T value);
+
+/// Used to instantiate a JSON object from a Preference string.
+typedef DecodeJsonPreference<T> = T Function(Map<String, dynamic> json);
 
 /// Provides utility functions for interacting with [SharedPreferences].
 /// Cannot be instantiated. Please use the static methods which are provided.
-abstract class PreferenceUtilities {
+abstract class PreferenceAdapter {
   /// Finds a matching writer for a Preference in [SharedPreferences].
   /// Known types are `String, int, double, bool, List<String>` and their nullable versions.
   static PreferenceWriter<T>? getWriter<T>(SharedPreferences prefs) {
@@ -40,6 +57,17 @@ abstract class PreferenceUtilities {
       PreferenceWriter<T>? serialize = getWriter<T>(prefs);
       await serialize?.call(key, value);
     }
+  }
+
+  /// Writes an object to [SharedPreferences] by encoding it with [JsonCodec.encode].
+  ///
+  /// Types that are used with this must provide a toJson method.
+  static void jsonWriter<T>(SharedPreferences prefs, String key, T value) {
+    String? result;
+    if (value != null) {
+      result = json.encode(value);
+    }
+    prefs.setStringOrNull(key, result);
   }
 
   /// Finds a matching reader for a Preference in [SharedPreferences].
@@ -80,6 +108,19 @@ abstract class PreferenceUtilities {
     return value ?? initialValue;
   }
 
+  /// Reads an object from [SharedPreferences] by decoding it with [JsonCodec.encode].
+  ///
+  /// A [fromJson] method be provided to instantiate the object.
+  static ReadPreference<T> jsonReader<T>(DecodeJsonPreference<T> fromJson) =>
+      (prefs, key) {
+        String? value = prefs.getString(key);
+        T? result;
+        if (value != null) {
+          result = fromJson(json.decode(value));
+        }
+        return result;
+      };
+
   /// Turns a generic into a Type.
   static Type _typeify<T>() => T;
 
@@ -87,7 +128,7 @@ abstract class PreferenceUtilities {
   static bool _typeMatch<T, E>() => T == E || _typeify<T?>() == E;
 }
 
-/// An error that is thrown when [PreferenceUtilities] cannot find a matching Reader for the given Preference Type.
+/// An error that is thrown when [PreferenceAdapter] cannot find a matching Reader for the given Preference Type.
 /// Supported Preference types include: `String, int, double, bool, List<String>` and their nullable versions.
 /// If you encounter this, please provide your own Reader with the [ReadPreference] parameter.
 class PreferenceReadError<T> extends Error {
@@ -97,7 +138,7 @@ class PreferenceReadError<T> extends Error {
       "\nPlease provide a reader callback.";
 }
 
-/// An error that is thrown when [PreferenceUtilities] cannot find a matching Writer for the given Preference Type.
+/// An error that is thrown when [PreferenceAdapter] cannot find a matching Writer for the given Preference Type.
 /// Supported Preference types include: `String, int, double, bool, List<String>` and their nullable versions.
 /// If you encounter this, please provide your own Writer with the [WritePreference] parameter.
 class PreferenceWriteError<T> extends Error {

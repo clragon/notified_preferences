@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'preference_read_write.dart';
+import 'preference_adapter.dart';
 
 /// Adds convenience methods for saving values to [SharedPreferences] that might be null.
 /// If the value is null, the corresponding key is removed.

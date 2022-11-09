@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'preference_read_write.dart';
-import 'preference_utilities.dart';
+import 'preference_adapter.dart';
 
 /// Stores a Preference in [SharedPreferences].
 /// When created, will read its own value from [SharedPreferences].
 /// Notifies all its listeners whenever its value is changed.
 /// Changes are written into the corresponding [SharedPreferences].
 class PreferenceNotifier<T> extends ValueNotifier<T> {
+  /// Creates a PreferenceNotifier
   PreferenceNotifier({
     required SharedPreferences preferences,
     required this.key,
@@ -17,7 +17,7 @@ class PreferenceNotifier<T> extends ValueNotifier<T> {
     this.write,
   })  : _prefs = preferences,
         super(
-          PreferenceUtilities.readSetting<T>(
+          PreferenceAdapter.readSetting<T>(
             prefs: preferences,
             key: key,
             initialValue: initialValue,
@@ -25,10 +25,26 @@ class PreferenceNotifier<T> extends ValueNotifier<T> {
           ),
         );
 
+  /// Creates a PreferenceNotifier that is stored as json string.
+  factory PreferenceNotifier.json({
+    required SharedPreferences preferences,
+    required String key,
+    required T initialValue,
+    required DecodeJsonPreference<T> fromJson,
+  }) {
+    return PreferenceNotifier(
+      preferences: preferences,
+      key: key,
+      initialValue: initialValue,
+      read: PreferenceAdapter.jsonReader(fromJson),
+      write: PreferenceAdapter.jsonWriter,
+    );
+  }
+
   @override
   set value(T value) {
     if (this.value != value) {
-      PreferenceUtilities.writeSetting<T>(
+      PreferenceAdapter.writeSetting<T>(
         prefs: _prefs,
         key: key,
         value: value,
@@ -40,7 +56,7 @@ class PreferenceNotifier<T> extends ValueNotifier<T> {
 
   /// Reads this setting from disk again.
   void reload() {
-    value = PreferenceUtilities.readSetting<T>(
+    value = PreferenceAdapter.readSetting<T>(
       prefs: _prefs,
       key: key,
       initialValue: initialValue,
