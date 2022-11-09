@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:notified_preferences/notified_preferences.dart';
 import 'package:test/test.dart';
+
+import 'common.dart';
 
 void main() {
   group('PreferenceNotifier', () {
@@ -87,6 +91,36 @@ void main() {
       expect(prefs.getString('abc'), 'def');
     });
 
-    test('should encode and decode to json', () {});
+    test('should encode and decode to json', () {
+      prefs.setString(
+          'json', json.encode(TestObject(someInt: 5, someString: 'abc')));
+      final notifier = PreferenceNotifier.json<TestObject?>(
+        preferences: prefs,
+        key: 'json',
+        initialValue: null,
+        fromJson: (value) => TestObject.fromJson(value),
+      );
+      expect(
+        notifier.value,
+        TestObject(someInt: 5, someString: 'abc'),
+      );
+      notifier.value = TestObject(someInt: 5, someString: 'abc');
+      expect(
+        TestObject.fromJson(json.decode(prefs.getString('json')!)),
+        TestObject(someInt: 5, someString: 'abc'),
+      );
+    });
+
+    test('should read and write enum values', () {
+      final notifier = PreferenceNotifier.enums<TestEnum>(
+        preferences: prefs,
+        key: 'enum',
+        initialValue: TestEnum.a,
+        values: TestEnum.values,
+      );
+      expect(notifier.value, TestEnum.a);
+      notifier.value = TestEnum.b;
+      expect(notifier.value, TestEnum.b);
+    });
   });
 }

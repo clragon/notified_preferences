@@ -19,7 +19,7 @@ class Settings with NotifiedPreferences {
       someInt: 0,
       someString: 'a',
     ),
-    fromJson: ComplexObject.fromJson,
+    fromJson: (json) => ComplexObject.fromJson(json),
   );
 
   /// It provides convenience methods for storing enums:

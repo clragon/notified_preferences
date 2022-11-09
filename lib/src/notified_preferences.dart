@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'nullable_preferences.dart';
 import 'preference_adapter.dart';
 import 'preference_notifier.dart';
 
@@ -65,7 +64,7 @@ abstract class NotifiedPreferences {
     required DecodeJsonPreference<T> fromJson,
   }) {
     _assertInitialized();
-    final notifier = PreferenceNotifier<T>.json(
+    final notifier = PreferenceNotifier.json<T>(
       preferences: _prefs!,
       key: key,
       initialValue: initialValue,
@@ -84,15 +83,14 @@ abstract class NotifiedPreferences {
     required List<T> values,
   }) {
     _assertInitialized();
-    return createSetting(
+    final notifier = PreferenceNotifier.enums<T>(
+      preferences: _prefs!,
       key: key,
       initialValue: initialValue,
-      read: (prefs, key) {
-        String? value = prefs.getString(key);
-        return values.asNameMap()[value];
-      },
-      write: (prefs, key, value) => prefs.setStringOrNull(key, value.name),
+      values: values,
     );
+    _notifiers.add(notifier);
+    return notifier;
   }
 
   /// Reloads the values of all Preferences.

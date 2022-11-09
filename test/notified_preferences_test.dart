@@ -83,7 +83,7 @@ void main() {
       final json = settings.createJsonSetting<TestObject>(
         key: 'json',
         initialValue: TestObject(someInt: 5, someString: 'abc'),
-        fromJson: TestObject.fromJson,
+        fromJson: (json) => TestObject.fromJson(json),
       );
       expect(json.value, TestObject(someInt: 5, someString: 'abc'));
       final testEnum = settings.createEnumSetting<TestEnum>(
@@ -106,7 +106,7 @@ class _TestSettings with NotifiedPreferences {
       createJsonSetting<TestObject>(
     key: 'object',
     initialValue: TestObject(someInt: 5, someString: 'abc'),
-    fromJson: TestObject.fromJson,
+    fromJson: (json) => TestObject.fromJson(json),
   );
 
   late final PreferenceNotifier<TestEnum> testEnum = createEnumSetting(

@@ -111,7 +111,7 @@ late final PreferenceNotifier<ComplexObject> complexObject = createJsonSetting(
     someInt: 0,
     someString: 'a',
   ),
-  fromJson: ComplexObject.fromJson,
+  fromJson: (json) => ComplexObject.fromJson(json),
 );
 ```
 

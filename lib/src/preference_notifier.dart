@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'nullable_preferences.dart';
 import 'preference_adapter.dart';
 
 /// Stores a Preference in [SharedPreferences].
@@ -8,7 +9,7 @@ import 'preference_adapter.dart';
 /// Notifies all its listeners whenever its value is changed.
 /// Changes are written into the corresponding [SharedPreferences].
 class PreferenceNotifier<T> extends ValueNotifier<T> {
-  /// Creates a PreferenceNotifier
+  /// Creates a PreferenceNotifier.
   PreferenceNotifier({
     required SharedPreferences preferences,
     required this.key,
@@ -26,20 +27,32 @@ class PreferenceNotifier<T> extends ValueNotifier<T> {
         );
 
   /// Creates a PreferenceNotifier that is stored as json string.
-  factory PreferenceNotifier.json({
+  static PreferenceNotifier<T> json<T>({
     required SharedPreferences preferences,
     required String key,
     required T initialValue,
-    required DecodeJsonPreference<T> fromJson,
-  }) {
-    return PreferenceNotifier(
-      preferences: preferences,
-      key: key,
-      initialValue: initialValue,
-      read: PreferenceAdapter.jsonReader(fromJson),
-      write: PreferenceAdapter.jsonWriter,
-    );
-  }
+    required T Function(dynamic json) fromJson,
+  }) =>
+      _JsonPreferenceNotifier(
+        preferences: preferences,
+        key: key,
+        initialValue: initialValue,
+        fromJson: fromJson,
+      );
+
+  /// Creates a PreferenceNotifier that stores an Enum by its name.
+  static PreferenceNotifier<T> enums<T extends Enum>({
+    required SharedPreferences preferences,
+    required String key,
+    required T initialValue,
+    required List<T> values,
+  }) =>
+      _EnumPreferenceNotifier(
+        preferences: preferences,
+        key: key,
+        initialValue: initialValue,
+        values: values,
+      );
 
   @override
   set value(T value) {
@@ -81,4 +94,30 @@ class PreferenceNotifier<T> extends ValueNotifier<T> {
 
   /// Resets this Preference to its initial value.
   void reset() => value = initialValue;
+}
+
+/// Creates a PreferenceNotifier that stores an Enum by its name.
+class _EnumPreferenceNotifier<T extends Enum> extends PreferenceNotifier<T> {
+  _EnumPreferenceNotifier({
+    required super.preferences,
+    required super.key,
+    required super.initialValue,
+    required List<T> values,
+  }) : super(
+          read: (prefs, key) => values.asNameMap()[prefs.getString(key)],
+          write: (prefs, key, value) => prefs.setStringOrNull(key, value.name),
+        );
+}
+
+/// Creates a PreferenceNotifier that is stored as json string.
+class _JsonPreferenceNotifier<T> extends PreferenceNotifier<T> {
+  _JsonPreferenceNotifier({
+    required super.preferences,
+    required super.key,
+    required super.initialValue,
+    required T Function(dynamic json) fromJson,
+  }) : super(
+          read: PreferenceAdapter.jsonReader(fromJson),
+          write: PreferenceAdapter.jsonWriter,
+        );
 }

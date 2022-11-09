@@ -142,7 +142,7 @@ void main() {
         prefs: prefs,
         key: 'json',
         initialValue: null,
-        read: PreferenceAdapter.jsonReader(TestObject.fromJson),
+        read: PreferenceAdapter.jsonReader((json) => TestObject.fromJson(json)),
       );
       expect(
         result,

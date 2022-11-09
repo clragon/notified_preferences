@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'nullable_preferences.dart';
+import 'type.dart';
 
 /// Reads [value] from [key].
 typedef PreferenceReader<T> = T? Function(String key);
@@ -18,7 +19,7 @@ typedef WritePreference<T> = void Function(
     SharedPreferences prefs, String key, T value);
 
 /// Used to instantiate a JSON object from a Preference string.
-typedef DecodeJsonPreference<T> = T Function(Map<String, dynamic> json);
+typedef DecodeJsonPreference<T> = T Function(dynamic json);
 
 /// Provides utility functions for interacting with [SharedPreferences].
 /// Cannot be instantiated. Please use the static methods which are provided.
@@ -26,19 +27,19 @@ abstract class PreferenceAdapter {
   /// Finds a matching writer for a Preference in [SharedPreferences].
   /// Known types are `String, int, double, bool, List<String>` and their nullable versions.
   static PreferenceWriter<T>? getWriter<T>(SharedPreferences prefs) {
-    if (_typeMatch<String, T>()) {
+    if (_isTypeOrNull<String, T>()) {
       return prefs.setStringOrNull as PreferenceWriter<T>;
     }
-    if (_typeMatch<int, T>()) {
+    if (_isTypeOrNull<int, T>()) {
       return prefs.setIntOrNull as PreferenceWriter<T>;
     }
-    if (_typeMatch<double, T>()) {
+    if (_isTypeOrNull<double, T>()) {
       return prefs.setDoubleOrNull as PreferenceWriter<T>;
     }
-    if (_typeMatch<bool, T>()) {
+    if (_isTypeOrNull<bool, T>()) {
       return prefs.setBoolOrNull as PreferenceWriter<T>;
     }
-    if (T == _typeify<List<String>>() || T == _typeify<List<String>?>()) {
+    if (_isTypeOrNull<List<String>, T>()) {
       return prefs.setStringListOrNull as PreferenceWriter<T>;
     }
     throw PreferenceWriteError<T>();
@@ -73,19 +74,19 @@ abstract class PreferenceAdapter {
   /// Finds a matching reader for a Preference in [SharedPreferences].
   /// Known types are `String, int, double, bool, List<String>` and their nullable versions.
   static PreferenceReader<T>? getReader<T>(SharedPreferences prefs) {
-    if (_typeMatch<String, T>()) {
+    if (_isTypeOrNull<String, T>()) {
       return prefs.getString as PreferenceReader<T>;
     }
-    if (_typeMatch<int, T>()) {
+    if (_isTypeOrNull<int, T>()) {
       return prefs.getInt as PreferenceReader<T>;
     }
-    if (_typeMatch<double, T>()) {
+    if (_isTypeOrNull<double, T>()) {
       return prefs.getDouble as PreferenceReader<T>;
     }
-    if (_typeMatch<bool, T>()) {
+    if (_isTypeOrNull<bool, T>()) {
       return prefs.getBool as PreferenceReader<T>;
     }
-    if (T == _typeify<List<String>>() || T == _typeify<List<String>?>()) {
+    if (_isTypeOrNull<List<String>, T>()) {
       return prefs.getStringList as PreferenceReader<T>;
     }
     throw PreferenceReadError<T>();
@@ -121,11 +122,8 @@ abstract class PreferenceAdapter {
         return result;
       };
 
-  /// Turns a generic into a Type.
-  static Type _typeify<T>() => T;
-
   /// Compares a generic [T] and [T]? to another generic [E].
-  static bool _typeMatch<T, E>() => T == E || _typeify<T?>() == E;
+  static bool _isTypeOrNull<T, E>() => ReType<E>().isSubTypeOf(ReType<T?>());
 }
 
 /// An error that is thrown when [PreferenceAdapter] cannot find a matching Reader for the given Preference Type.
