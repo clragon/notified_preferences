@@ -2,7 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/notified_preferences.svg)](https://pub.dartlang.org/packages/notified_preferences)
 
-Flutter plugin for reading and writing simple key-value pairs.
+Flutter plugin for reading and writing key-value pairs.
 
 notified_preferences is a wrapper around shared_preferences.
 It provides you with an easy way of listening to changes in your preference values.
@@ -130,7 +130,7 @@ If you would like to store your Preferences on multiple classes instead of a sin
 you can use `NotifiedSettings`, which is not abstract:
 
 ```dart
-NotifiedSettings settings = NotifiedSettings.getInstance();
+NotifiedSettings settings = await NotifiedSettings.getInstance();
 
 class SomeController {
     final ValueNotifier<String?> someValue = settings.createSettings(
