@@ -19,6 +19,17 @@ class ComplexObject {
 
   final int someInt;
   final String someString;
+
+  @override
+  operator ==(Object other) {
+    if (other is ComplexObject) {
+      return someInt == other.someInt && someString == other.someString;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => Object.hash(someInt, someString);
 }
 
 /// An example enum

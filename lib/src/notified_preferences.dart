@@ -176,7 +176,7 @@ abstract class NotifiedPreferences {
     if (_prefs == null) {
       throw StateError(
         '$runtimeType was not initialized!\n\n'
-        'You must call the initalize() function on your NotifiedSharedPreferences extension before using it,'
+        'You must call the initialize() function on your NotifiedSharedPreferences extension before using it,'
         'to ensure that a SharedPreferences instance has been obtained!\n'
         'A good place to do so is in the main function:\n\n'
         'void main() {'
@@ -191,12 +191,38 @@ abstract class NotifiedPreferences {
 
 /// Provides Preferences for immediate usage, without having to create a new class.
 ///
-/// Can be used to create Preferences accross multiple classes.
+/// Can be used to create Preferences across multiple classes.
 class NotifiedSettings with NotifiedPreferences {
   NotifiedSettings(SharedPreferences preferences) {
     initialize(preferences);
   }
 
-  Future<NotifiedSettings> getInstance() async =>
+  static Future<NotifiedSettings> getInstance() async =>
       NotifiedSettings(await SharedPreferences.getInstance());
+
+  @override
+  PreferenceNotifier<T> createSetting<T>({
+    required String key,
+    required T initialValue,
+    ReadPreference<T>? read,
+    WritePreference<T>? write,
+  }) =>
+      super.createSetting(
+        key: key,
+        initialValue: initialValue,
+        read: read,
+        write: write,
+      );
+
+  @override
+  PreferenceNotifier<T> createEnumSetting<T extends Enum>({
+    required String key,
+    required T initialValue,
+    required List<T> values,
+  }) =>
+      super.createEnumSetting(
+        key: key,
+        initialValue: initialValue,
+        values: values,
+      );
 }

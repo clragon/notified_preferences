@@ -26,7 +26,7 @@ class Settings with NotifiedPreferences {
       String? value = prefs.getString(key);
       ComplexObject? result;
       if (value != null) {
-        return ComplexObject.fromJson(jsonDecode(value));
+        return ComplexObject.fromJson(json.decode(value));
       }
       return result;
     },
