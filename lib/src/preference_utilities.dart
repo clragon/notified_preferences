@@ -15,6 +15,9 @@ abstract class PreferenceUtilities {
     if (_typeMatch<int, T>()) {
       return prefs.setIntOrNull as PreferenceWriter<T>;
     }
+    if (_typeMatch<double, T>()) {
+      return prefs.setDoubleOrNull as PreferenceWriter<T>;
+    }
     if (_typeMatch<bool, T>()) {
       return prefs.setBoolOrNull as PreferenceWriter<T>;
     }
@@ -47,6 +50,9 @@ abstract class PreferenceUtilities {
     }
     if (_typeMatch<int, T>()) {
       return prefs.getInt as PreferenceReader<T>;
+    }
+    if (_typeMatch<double, T>()) {
+      return prefs.getDouble as PreferenceReader<T>;
     }
     if (_typeMatch<bool, T>()) {
       return prefs.getBool as PreferenceReader<T>;

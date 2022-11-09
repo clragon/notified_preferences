@@ -24,6 +24,12 @@ void main() {
         value: 5,
       );
       expect(prefs.getInt('int'), 5);
+      PreferenceUtilities.writeSetting<double>(
+        prefs: prefs,
+        key: 'double',
+        value: 5.5,
+      );
+      expect(prefs.getDouble('double'), 5.5);
       PreferenceUtilities.writeSetting<bool>(
         prefs: prefs,
         key: 'bool',
@@ -73,6 +79,13 @@ void main() {
         initialValue: null,
       );
       expect(prefs.getInt('int'), 5);
+      prefs.setDouble('double', 5.5);
+      PreferenceUtilities.readSetting<double?>(
+        prefs: prefs,
+        key: 'double',
+        initialValue: null,
+      );
+      expect(prefs.getDouble('double'), 5.5);
       prefs.setBool('bool', true);
       PreferenceUtilities.readSetting<bool?>(
         prefs: prefs,
