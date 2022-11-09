@@ -92,10 +92,9 @@ abstract class PreferenceUtilities {
 /// If you encounter this, please provide your own Reader with the [ReadPreference] parameter.
 class PreferenceReadError<T> extends Error {
   @override
-  String toString() {
-    return "Error: PreferenceUtilities failed to read $T because it wasn't String, int, double, bool or List<String>."
-        "\nPlease provide a reader callback.";
-  }
+  String toString() =>
+      "Error: PreferenceUtilities failed to read $T because it wasn't String, int, double, bool or List<String>."
+      "\nPlease provide a reader callback.";
 }
 
 /// An error that is thrown when [PreferenceUtilities] cannot find a matching Writer for the given Preference Type.
@@ -103,8 +102,7 @@ class PreferenceReadError<T> extends Error {
 /// If you encounter this, please provide your own Writer with the [WritePreference] parameter.
 class PreferenceWriteError<T> extends Error {
   @override
-  String toString() {
-    return "Error: PreferenceUtilities failed to write $T because it wasn't String, int, double, bool or List<String>."
-        "\nPlease provide a writer callback.";
-  }
+  String toString() =>
+      "Error: PreferenceUtilities failed to write $T because it wasn't String, int, double, bool or List<String>."
+      "\nPlease provide a writer callback.";
 }

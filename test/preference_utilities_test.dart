@@ -123,5 +123,10 @@ void main() {
         throwsA(const TypeMatcher<PreferenceReadError<Object>>()),
       );
     });
+
+    test('provides satisfactory error messages', () {
+      expect(PreferenceReadError<Object?>().toString(), contains('Object?'));
+      expect(PreferenceWriteError<Object?>().toString(), contains('Object?'));
+    });
   });
 }
