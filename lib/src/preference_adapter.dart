@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'nullable_preferences.dart';
-import 'type.dart';
+import 'retype.dart';
 
 /// Reads [value] from [key].
 typedef PreferenceReader<T> = T? Function(String key);
