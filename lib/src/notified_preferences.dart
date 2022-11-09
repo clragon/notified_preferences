@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,8 +83,8 @@ abstract class NotifiedPreferences {
   /// This method should be called in your main method, before runApp.
   ///
   /// You can pass a custom [SharedPreferences] instance, in case you are using another library that wraps it.
-  Future<void> initialize({SharedPreferences? preferences}) async =>
-      _prefs = preferences ?? await SharedPreferences.getInstance();
+  Future<void> initialize(FutureOr<SharedPreferences>? preferences) async =>
+      _prefs = await (preferences ?? SharedPreferences.getInstance());
 
   SharedPreferences? _prefs;
   final List<PreferenceNotifier> _notifiers = [];
@@ -181,4 +183,16 @@ abstract class NotifiedPreferences {
       );
     }
   }
+}
+
+/// Provides Preferences for immediate usage, without having to create a new class.
+///
+/// Can be used to create Preferences accross multiple classes.
+class NotifiedSettings with NotifiedPreferences {
+  NotifiedSettings(SharedPreferences preferences) {
+    initialize(preferences);
+  }
+
+  Future<NotifiedSettings> getInstance() async =>
+      NotifiedSettings(await SharedPreferences.getInstance());
 }
