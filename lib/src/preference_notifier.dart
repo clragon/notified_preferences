@@ -63,6 +63,6 @@ class PreferenceNotifier<T> extends ValueNotifier<T> {
   /// The method to write this Preference. This is required for special Types.
   final WritePreference<T>? write;
 
-  /// Resets this Preference to its inital value.
+  /// Resets this Preference to its initial value.
   void reset() => value = initialValue;
 }
