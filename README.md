@@ -46,8 +46,15 @@ class Settings with NotifiedPreferences {
 
 ```dart
 Future<void> main() async {
+  Settings settings = Settings();
   await settings.initialize();
-  runApp(MyApp());
+  runApp(
+    // inject your settings here, with e.g. Provider.
+    Provider.value(
+      value: settings,
+      child: MyApp(),
+    )
+  );
 }
 ```
 
