@@ -96,7 +96,7 @@ void dispose() {
 }
 ```
 
-! Using anonymous functions with `addListener` leads to them being unable of being removed !
+! Using anonymous functions with `addListener` results in them being unable to be removed !
 
 ### Json
 
