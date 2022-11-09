@@ -1,6 +1,8 @@
 # notified_preferences
 
 [![pub package](https://img.shields.io/pub/v/notified_preferences.svg)](https://pub.dartlang.org/packages/notified_preferences)
+[![Build Status](https://github.com/clragon/notified_preferences/actions/workflows/test.yml/badge.svg)](https://github.com/clragon/notified_preferences/actions/workflows/test.yml)
+[![Coverage Status](https://coveralls.io/repos/github/clragon/notified_preferences/badge.svg)](https://coveralls.io/github/clragon/notified_preferences)
 
 Flutter plugin for reading and writing key-value pairs.
 
