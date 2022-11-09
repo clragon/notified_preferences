@@ -24,6 +24,14 @@ void main() {
         const ReType<A>() == const ReType<B>(),
         false,
       );
+      expect(
+        const ReType<A>().hashCode == const ReType<A>().hashCode,
+        true,
+      );
+      expect(
+        const ReType<A>().hashCode == const ReType<B>().hashCode,
+        false,
+      );
     });
 
     test('provides information', () {
