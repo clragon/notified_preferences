@@ -194,7 +194,7 @@ abstract class NotifiedPreferences {
 /// Can be used to create Preferences across multiple classes.
 class NotifiedSettings with NotifiedPreferences {
   NotifiedSettings(SharedPreferences preferences) {
-    initialize(preferences);
+    _prefs = preferences;
   }
 
   static Future<NotifiedSettings> getInstance() async =>

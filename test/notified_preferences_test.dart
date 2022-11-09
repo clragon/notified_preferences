@@ -32,6 +32,15 @@ void main() {
       expect(settings.testEnum.value, _TestEnum.a);
     });
 
+    test('creates enum setting correctly', () async {
+      _TestSettings settings = _TestSettings();
+      await settings.initialize();
+      expect(settings.testEnum.value, _TestEnum.a);
+      settings.testEnum.value = _TestEnum.c;
+      expect(settings.testEnum.value, _TestEnum.c);
+      expect(prefs.getString('testEnum'), 'c');
+    });
+
     test('can reload settings', () async {
       _TestSettings settings = _TestSettings();
       await settings.initialize(prefs);
@@ -44,8 +53,8 @@ void main() {
       _TestSettings settings = _TestSettings();
       await settings.initialize(prefs);
       settings.string.value = 'xyz';
-      settings.reload();
-      expect(settings.string.value, 'xyz');
+      await settings.clear();
+      expect(settings.string.value, 'abc');
     });
   });
 
@@ -58,8 +67,25 @@ void main() {
     });
 
     test('is initialized properly', () async {
-      await NotifiedSettings.getInstance();
-      NotifiedSettings(prefs);
+      final natural = await NotifiedSettings.getInstance();
+      natural.reload();
+      final artificial = NotifiedSettings(prefs);
+      artificial.reload();
+    });
+
+    test('can create settings', () {
+      NotifiedSettings settings = NotifiedSettings(prefs);
+      final string = settings.createSetting(
+        key: 'string',
+        initialValue: 'abc',
+      );
+      expect(string.value, 'abc');
+      final testEnum = settings.createEnumSetting(
+        key: 'testEnum',
+        initialValue: _TestEnum.a,
+        values: _TestEnum.values,
+      );
+      expect(testEnum.value, _TestEnum.a);
     });
   });
 }
