@@ -11,7 +11,23 @@ It provides you with an easy way of listening to changes in your preference valu
 
 If you're already using `shared_preferences`, you can replace it.
 
+### Index
+
+- [Index](#index)
+- [Usage](#usage)
+  - [Getting started](#getting-started)
+  - [Widgets](#widgets)
+  - [Listeners](#listeners)
+  - [Custom types](#custom-types)
+  - [Enums](#enums)
+- [Advanced usage](#advanced-usage)
+  - [Custom shared prefs instance](#custom-shared-prefs-instance)
+  - [Manual notifiers](#manual-notifiers)
+  - [Decentralised settings](#decentralised-settings)
+
 ## Usage
+
+### Getting started
 
 A helper mixin class, `NotifiedPreferences` is provided with which you can create your own Settings object:
 
@@ -36,6 +52,8 @@ Future<void> main() async {
 
 This has the benefit that all other operations are completely synchronous.
 
+### Widgets
+
 You can listen to your preferences by using `ValueListenableBuilder` just like with normal `ValueNotifier`:
 
 ```dart
@@ -54,6 +72,32 @@ FloatingActionButton(
   child: const Icon(Icons.add),
 ),
 ```
+
+### Listeners
+
+You can also listen to your preferences with `addListener`:
+
+```dart
+void _onClicked() {
+  print('The user has clicked ${settings.clicked.value} times!');
+}
+
+settings.clicked.addListener(_onClicked);
+```
+
+Remember to remove the listener again, to avoid memory leaks:
+
+```dart
+@override
+void dispose() {
+  settings.clicked.removeListener(_onClicked);
+  super.dispose();
+}
+```
+
+! Using anonymous functions with `addListener` leads to them being unable of being removed !
+
+### Custom types
 
 If you want to store preferences which aren't contained in the base types,
 `String, int, double, bool, List<String>` and their nullable counterparts,
@@ -82,6 +126,8 @@ late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
 );
 ```
 
+### Enums
+
 If you want to store enums, convenience methods are provided:
 
 ```dart
@@ -94,12 +140,16 @@ late final PreferenceNotifier<SomeEnum> someEnum = createEnumSetting(
 
 ## Advanced usage
 
+### Custom shared prefs instance
+
 If you are already using a different `SharedPreferences` wrapper like encrypted_shared_preferences,
 or if you wanna mock the implementation for testing, you can pass it during itialization:
 
 ```dart
 await settings.initialize(otherSharedPrefs);
 ```
+
+### Manual notifiers
 
 If you do not want to use the `NotifiedPreferences`, you can instantiate your `PreferenceNotifier`s manually:
 
@@ -112,6 +162,8 @@ final myNotifier = PreferenceNotifier<T>(
   write: write,
 );
 ```
+
+### Decentralised settings
 
 If you would like to store your Preferences on multiple classes instead of a single one,
 you can use `NotifiedSettings`, which is not abstract:
