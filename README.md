@@ -21,7 +21,7 @@ If you're already using `shared_preferences`, you can replace it.
   - [Json](#json)
   - [Enums](#enums)
 - [Advanced usage](#advanced-usage)
-  - [Custom shared prefs instance](#custom-shared-prefs-instance)
+  - [Custom shared prefs](#custom-shared-prefs)
   - [Manual notifiers](#manual-notifiers)
   - [Custom Read/Write](#custom-readwrite)
   - [Decentralised settings](#decentralised-settings)
