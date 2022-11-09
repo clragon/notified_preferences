@@ -44,6 +44,20 @@ void main() {
       expect(notifier.value, 'def');
     });
 
+    test('notifies its listeners when its value changes', () {
+      final notifier = PreferenceNotifier<String?>(
+        preferences: prefs,
+        key: 'abc',
+        initialValue: null,
+      );
+
+      bool called = false;
+      notifier.addListener(() => called = true);
+      notifier.value = 'def';
+
+      expect(called, true);
+    });
+
     test('should allow reloading its value from disk', () {
       final notifier = PreferenceNotifier<String?>(
         preferences: prefs,
