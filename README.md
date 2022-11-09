@@ -129,10 +129,10 @@ late final PreferenceNotifier<SomeEnum> someEnum = createEnumSetting(
 
 ## Advanced usage
 
-### Custom shared prefs instance
+### Custom shared prefs
 
-If you are already using a different `SharedPreferences` wrapper like encrypted_shared_preferences,
-or if you wanna mock the implementation for testing, you can pass it during itialization:
+If you are already using a different `SharedPreferences` wrapper like [`encrypted_shared_preferences`](https://pub.dev/packages/encrypted_shared_preferences),
+or if you want to mock the implementation for testing, you can pass it during initialisation:
 
 ```dart
 await settings.initialize(otherSharedPrefs);
@@ -140,7 +140,7 @@ await settings.initialize(otherSharedPrefs);
 
 ### Manual notifiers
 
-If you do not want to use the `NotifiedPreferences`, you can instantiate your `PreferenceNotifier`s manually:
+If you do not want to use `NotifiedPreferences`, you can instantiate your `PreferenceNotifier`s manually:
 
 ```dart
 final myNotifier = PreferenceNotifier<T>(
@@ -151,6 +151,8 @@ final myNotifier = PreferenceNotifier<T>(
   write: write,
 );
 ```
+
+Note that you lose functionality to clear all your settings.
 
 ### Custom Read/Write
 
@@ -195,3 +197,5 @@ class SomeController {
     );
 }
 ```
+
+This way you can retain your ability to clear all settings.
