@@ -59,19 +59,24 @@ import 'nullable_preferences.dart';
 /// you can provide custom methods to read and write it, like shown in the following example:
 ///
 /// ```dart
-/// late final PreferenceNotifier<Credentials?> credentials = createSetting(
-///   key: 'credentials',
-///   initial: null,
+/// late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
+///   key: 'complexObject',
+///   initialValue: ComplexObject(
+///     someInt: 0,
+///     someString: 'a',
+///   ),
 ///   read: (prefs, key) {
 ///     String? value = prefs.getString(key);
+///     ComplexObject? result;
 ///     if (value != null) {
-///       return Credentials.fromJson(value);
-///     } else {
-///       return null;
+///       result = ComplexObject.fromJson(jsonDecode(value));
 ///     }
+///     return result;
 ///   },
-///   write: (prefs, key, value) async =>
-///     prefs.setStringOrNull(key: key, value: value?.toJson()),
+///   write: (prefs, key, value) => prefs.setStringOrNull(
+///     key,
+///     json.encode(value.toJson()),
+///   ),
 /// );
 /// ```
 ///

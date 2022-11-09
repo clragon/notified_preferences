@@ -7,22 +7,7 @@ Flutter plugin for reading and writing key-value pairs.
 notified_preferences is a wrapper around shared_preferences.
 It provides you with an easy way of listening to changes in your preference values.
 
-## Getting started
-
-First, add notified_preferences into your pubspec.yaml.
-
-```yaml
-dependencies:
-  notified_preferences: ^0.0.1
-```
-
-If you're already using `shared_preferences`, you can replace it:
-
-```diff
-dependencies:
--   shared_preferences: ^2.0.15
-+   notified_preferences: ^0.0.1
-```
+If you're already using `shared_preferences`, you can replace it.
 
 ## Usage
 
@@ -84,7 +69,7 @@ late final PreferenceNotifier<ComplexObject> complexObject = createSetting(
     String? value = prefs.getString(key);
     ComplexObject? result;
     if (value != null) {
-      return ComplexObject.fromJson(jsonDecode(value));
+      result = ComplexObject.fromJson(jsonDecode(value));
     }
     return result;
   },
@@ -114,7 +99,7 @@ or if you wanna mock the implementation for testing, you can pass it during itia
 await settings.initialize(otherSharedPrefs);
 ```
 
-If you do not want to use the `NotifiedPreferences`, you can manually instantiate your `PreferenceNotifier`s manually:
+If you do not want to use the `NotifiedPreferences`, you can instantiate your `PreferenceNotifier`s manually:
 
 ```dart
 final myNotifier = PreferenceNotifier<T>(
