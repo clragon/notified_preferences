@@ -5,9 +5,7 @@ import 'preference_read_write.dart';
 
 /// Provides utility functions for interacting with [SharedPreferences].
 /// Cannot be instantiated. Please use the static methods which are provided.
-class PreferenceUtilities {
-  PreferenceUtilities._();
-
+abstract class PreferenceUtilities {
   /// Finds a matching writer for a Preference in [SharedPreferences].
   /// Known types are `String, int, double, bool, List<String>` and their nullable versions.
   static PreferenceWriter<T>? getWriter<T>(SharedPreferences prefs) {
@@ -23,7 +21,7 @@ class PreferenceUtilities {
     if (T == _typeify<List<String>>() || T == _typeify<List<String>?>()) {
       return prefs.setStringListOrNull as PreferenceWriter<T>;
     }
-    throw PreferenceReadError<T>();
+    throw PreferenceWriteError<T>();
   }
 
   /// Writes a Preference to [SharedPreferences].
@@ -56,7 +54,7 @@ class PreferenceUtilities {
     if (T == _typeify<List<String>>() || T == _typeify<List<String>?>()) {
       return prefs.getStringList as PreferenceReader<T>;
     }
-    throw PreferenceWriteError<T>();
+    throw PreferenceReadError<T>();
   }
 
   /// Reads a Preference from [SharedPreferences].

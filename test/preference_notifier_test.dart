@@ -44,7 +44,7 @@ void main() {
       expect(notifier.value, 'def');
     });
 
-    test('notifies its listeners when its value changes', () {
+    test('should notify its listeners when its value changes', () {
       final notifier = PreferenceNotifier<String?>(
         preferences: prefs,
         key: 'abc',
@@ -70,6 +70,21 @@ void main() {
       notifier.reload();
 
       expect(notifier.value, 'def');
+    });
+
+    test('should allow resetting its value', () {
+      final notifier = PreferenceNotifier<String?>(
+        preferences: prefs,
+        key: 'abc',
+        initialValue: 'def',
+      );
+
+      expect(notifier.value, 'xyz');
+
+      notifier.reset();
+
+      expect(notifier.value, 'def');
+      expect(prefs.getString('abc'), 'def');
     });
   });
 }
