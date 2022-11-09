@@ -1,7 +1,7 @@
 name: notified_preferences_example
 description: An example application for the notified_preferences package.
 
-publish_to: "none"
+publish_to: none
 
 version: 1.0.0+1
 
