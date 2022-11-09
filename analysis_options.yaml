@@ -1,4 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+# https://dart-lang.github.io/linter/lints/index.html.
+linter:
+  rules:
+    avoid_redundant_argument_values: true
+    use_super_parameters: true
+    directives_ordering: true
+    sort_constructors_first: true

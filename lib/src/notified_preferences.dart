@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'nullable_preferences.dart';
 import 'preference_notifier.dart';
 import 'preference_read_write.dart';
-import 'nullable_preferences.dart';
 
 /// Provides easily creating listenable preferences with [SharedPreferences].
 ///
