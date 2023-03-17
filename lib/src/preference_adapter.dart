@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:runtime_type/runtime_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'nullable_preferences.dart';
-import 'retype.dart';
 
 /// Reads [value] from [key].
 typedef PreferenceReader<T> = T? Function(String key);
@@ -123,7 +123,8 @@ abstract class PreferenceAdapter {
       };
 
   /// Compares a generic [T] and [T]? to another generic [E].
-  static bool _isTypeOrNull<T, E>() => ReType<E>().isSubTypeOf(ReType<T?>());
+  static bool _isTypeOrNull<T, E>() =>
+      RuntimeType<E>().isSubtypeOf(RuntimeType<T?>());
 }
 
 /// An error that is thrown when [PreferenceAdapter] cannot find a matching Reader for the given Preference Type.

@@ -1,6 +1,6 @@
 name: notified_preferences
 description: A wrapper around sharedpreferences which provides a valuenotifier for each preference.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/clragon/notified_preferences
 
 environment:
@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  runtime_type: ^1.0.1
   shared_preferences: ^2.0.15
 
 dev_dependencies:
