@@ -2,59 +2,68 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:notified_preferences/notified_preferences.dart';
 
 import 'common.dart';
+import 'memory_shared_preferences.dart';
 
 void main() {
   group('NotifiedPreferences', () {
     late SharedPreferences prefs;
+    late NotifiedSettings settings;
+    late PreferenceNotifier<String> string;
+    late PreferenceNotifier<TestObject> object;
+    late PreferenceNotifier<TestEnum> testEnum;
 
     setUp(() async {
-      SharedPreferences.setMockInitialValues({'abc': 'xyz'});
-      prefs = await SharedPreferences.getInstance();
-    });
+      prefs = MemorySharedPreferences({'abc': 'xyz'});
+      settings = NotifiedSettings(prefs);
+      string = settings.createSetting(
+        key: 'string',
+        initialValue: 'abc',
+      );
 
-    test('is initialized properly', () async {
-      _TestSettings settings = _TestSettings();
-      await settings.initialize();
-    });
+      object = settings.createJsonSetting<TestObject>(
+        key: 'object',
+        initialValue: TestObject(someInt: 5, someString: 'abc'),
+        fromJson: (json) => TestObject.fromJson(json),
+      );
 
-    test('throws when not initialized', () {
-      expect(
-        () => _TestSettings().string.value,
-        throwsA(const TypeMatcher<StateError>()),
+      testEnum = settings.createEnumSetting(
+        key: 'testEnum',
+        initialValue: TestEnum.a,
+        values: TestEnum.values,
       );
     });
 
-    test('creates settings correctly', () async {
-      _TestSettings settings = _TestSettings();
+    test('is initialized properly', () async {
       await settings.initialize();
-      expect(settings.string.value, 'abc');
-      expect(settings.object.value, TestObject(someInt: 5, someString: 'abc'));
-      expect(settings.testEnum.value, TestEnum.a);
+    });
+
+    test('creates settings correctly', () async {
+      await settings.initialize();
+      expect(string.value, 'abc');
+      expect(object.value, TestObject(someInt: 5, someString: 'abc'));
+      expect(testEnum.value, TestEnum.a);
     });
 
     test('creates enum setting correctly', () async {
-      _TestSettings settings = _TestSettings();
       await settings.initialize();
-      expect(settings.testEnum.value, TestEnum.a);
-      settings.testEnum.value = TestEnum.c;
-      expect(settings.testEnum.value, TestEnum.c);
+      expect(testEnum.value, TestEnum.a);
+      testEnum.value = TestEnum.c;
+      expect(testEnum.value, TestEnum.c);
       expect(prefs.getString('testEnum'), 'c');
     });
 
     test('can reload settings', () async {
-      _TestSettings settings = _TestSettings();
       await settings.initialize(prefs);
       prefs.setString('string', 'xyz');
-      settings.reload();
-      expect(settings.string.value, 'xyz');
+      await settings.reload();
+      expect(string.value, 'xyz');
     });
 
     test('can clear settings', () async {
-      _TestSettings settings = _TestSettings();
       await settings.initialize(prefs);
-      settings.string.value = 'xyz';
+      string.value = 'xyz';
       await settings.clear();
-      expect(settings.string.value, 'abc');
+      expect(string.value, 'abc');
     });
   });
 
@@ -94,24 +103,4 @@ void main() {
       expect(testEnum.value, TestEnum.a);
     });
   });
-}
-
-class _TestSettings with NotifiedPreferences {
-  late final PreferenceNotifier<String> string = createSetting(
-    key: 'string',
-    initialValue: 'abc',
-  );
-
-  late final PreferenceNotifier<TestObject> object =
-      createJsonSetting<TestObject>(
-    key: 'object',
-    initialValue: TestObject(someInt: 5, someString: 'abc'),
-    fromJson: (json) => TestObject.fromJson(json),
-  );
-
-  late final PreferenceNotifier<TestEnum> testEnum = createEnumSetting(
-    key: 'testEnum',
-    initialValue: TestEnum.a,
-    values: TestEnum.values,
-  );
 }

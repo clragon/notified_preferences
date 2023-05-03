@@ -4,14 +4,14 @@ import 'package:notified_preferences/notified_preferences.dart';
 import 'package:test/test.dart';
 
 import 'common.dart';
+import 'memory_shared_preferences.dart';
 
 void main() {
   group('PreferenceAdapter', () {
     late SharedPreferences prefs;
 
-    setUp(() async {
-      SharedPreferences.setMockInitialValues({'abc': 'xyz'});
-      prefs = await SharedPreferences.getInstance();
+    setUp(() {
+      prefs = MemorySharedPreferences({'abc': 'xyz'});
     });
 
     test('should use the correct writer', () async {

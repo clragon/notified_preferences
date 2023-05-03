@@ -15,7 +15,7 @@ abstract class NotifiedPreferences {
   ///
   /// You can pass a custom [SharedPreferences] instance, in case you are using another library that wraps it.
   Future<void> initialize([FutureOr<SharedPreferences>? preferences]) async =>
-      _prefs = await (preferences ?? SharedPreferences.getInstance());
+      _prefs ??= await (preferences ?? SharedPreferences.getInstance());
 
   /// internal sharedp preference instance.
   SharedPreferences? _prefs;
@@ -121,6 +121,9 @@ abstract class NotifiedPreferences {
     _reload();
   }
 
+  // Mixins don't get coverage, if they are on explicit test classes.
+  // [NotifiedSettings] doesn't allow this error to happen. We therefore exclude this from coverage.
+  // coverage:ignore-start
   /// Ensures that the [NotifiedPreferences] object has been properly initialized.
   void _assertInitialized() {
     if (_prefs == null) {
@@ -137,6 +140,7 @@ abstract class NotifiedPreferences {
       );
     }
   }
+  // coverage:ignore-end
 }
 
 /// Provides Preferences for immediate usage, without having to create a new class.
