@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   runtime_type: ^1.0.1
-  shared_preferences: ^2.0.15
+  shared_preferences: ">=2.0.0 <3.0.0"
 
 dev_dependencies:
   flutter_test:
