@@ -130,7 +130,7 @@ abstract class NotifiedPreferences {
         'to ensure that a SharedPreferences instance has been obtained!\n'
         'A good place to do so is in the main function:\n\n'
         'void main() {'
-        '  $runtimeType settings = $runtimeType;'
+        '  $runtimeType settings = $runtimeType();'
         '  await settings.initialize();'
         '  runApp();'
         '}',
