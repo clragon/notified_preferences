@@ -43,7 +43,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Prevent including too many platforms:
+# Prevent including platforms:
+android
+ios
 windows
 macos
 linux
