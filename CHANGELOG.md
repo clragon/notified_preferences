@@ -1,3 +1,9 @@
+## 2.1.0
+
+- Improved logic internally
+- Fixed dependency versions
+- Rereleased under MIT license
+
 ## 2.0.0
 
 - Improved PreferenceNotifier.json
